@@ -1,21 +1,19 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
 const mysql = require('mysql2');
+const path = require('path');
 
 // Create Express App
 const app = express();
 app.use(bodyParser.json());
-
-// Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files like HTML, CSS, JS
 
 // MySQL connection
 const db = mysql.createConnection({
     host: 'localhost',
-    user: 'root',       // Your MySQL username
-    password: 'password', // Your MySQL password
-    database: 'scanner_db'  // Database name
+    user: 'root',
+    password: 'password',
+    database: 'scanner_db'
 });
 
 db.connect(err => {
@@ -26,84 +24,175 @@ db.connect(err => {
     console.log('Connected to the MySQL database.');
 });
 
-// Helper function to update user water intake
-function updateUserWater(userId, waterMl, res) {
-    const updateSql = `UPDATE users SET total_ml_water = total_ml_water + ? WHERE id = ?`;
-    db.query(updateSql, [waterMl, userId], (err, result) => {
-        if (err) {
-            console.error('Error updating user water intake:', err);
-            return res.status(500).send({ message: 'Error updating user water intake' });
-        }
-
-        const scanSql = `INSERT INTO scans (user_id, water_ml) VALUES (?, ?)`;
-        db.query(scanSql, [userId, waterMl], (err, result) => {
-            if (err) {
-                console.error('Error logging the scan:', err);
-                return res.status(500).send({ message: 'Error logging the scan' });
-            }
-            res.status(200).send({ message: `Successfully added ${waterMl} ml to user ${userId}` });
-        });
-    });
-}
-
-// API for handling QR code scan (direct ml value)
-app.post('/api/qr-scan', (req, res) => {
-    const { userId, waterMl } = req.body;
-
-    if (!userId || !waterMl) {
-        return res.status(400).send({ message: 'Missing userId or waterMl' });
-    }
-
-    updateUserWater(userId, waterMl, res);
+// Serve the index page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// API for handling barcode scan (look up product in database)
+// Serve the manage page
+app.get('/manage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'manage.html'));
+});
+
+// API to fetch all users
+app.get('/api/users', (req, res) => {
+    const sql = 'SELECT id, username FROM users';
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.error('Error fetching users:', err);
+            return res.status(500).send({ message: 'Error fetching users' });
+        }
+        res.send(result);
+    });
+});
+
+// API to fetch all products
+app.get('/api/products', (req, res) => {
+    const sql = 'SELECT id, name, barcode, water_ml FROM products';
+    db.query(sql, (err, result) => {
+        if (err) {
+            console.error('Error fetching products:', err);
+            return res.status(500).send({ message: 'Error fetching products' });
+        }
+        res.send(result);
+    });
+});
+
+// API to handle barcode scanning and update user's water consumption
 app.post('/api/barcode-scan', (req, res) => {
     const { userId, barcode } = req.body;
 
+    // Check if userId and barcode are provided
     if (!userId || !barcode) {
-        return res.status(400).send({ message: 'Missing userId or barcode' });
+        return res.status(400).send({ message: 'User ID and barcode are required' });
     }
 
-    const sql = `SELECT water_ml FROM products WHERE barcode = ?`;
-    db.query(sql, [barcode], (err, result) => {
+    // Query to find the product by its barcode
+    const productQuery = 'SELECT water_ml FROM products WHERE barcode = ?';
+    db.query(productQuery, [barcode], (err, productResult) => {
         if (err) {
             console.error('Error fetching product by barcode:', err);
             return res.status(500).send({ message: 'Error fetching product data' });
         }
 
-        if (result.length === 0) {
+        // If the product is not found
+        if (productResult.length === 0) {
             return res.status(404).send({ message: 'Product not found' });
         }
 
-        const waterMl = result[0].water_ml;
-        updateUserWater(userId, waterMl, res);
+        // Get the water_ml associated with the product
+        const waterMl = productResult[0].water_ml;
+
+        // Query to update the user's total water consumption
+        const updateUserQuery = 'UPDATE users SET total_ml_water = total_ml_water + ? WHERE id = ?';
+        db.query(updateUserQuery, [waterMl, userId], (err, updateResult) => {
+            if (err) {
+                console.error('Error updating user water intake:', err);
+                return res.status(500).send({ message: 'Error updating user water intake' });
+            }
+
+            // Success: Respond with the updated water intake
+            res.send({ message: `Successfully added ${waterMl} ml to user ${userId}` });
+        });
     });
 });
 
-// API to get the total water consumption of a user
+
+// API to get the total water consumption of a user by their ID
 app.get('/api/user-water/:userId', (req, res) => {
     const userId = req.params.userId;
 
-    const sql = `SELECT total_ml_water FROM users WHERE id = ?`;
+    // Check if userId is provided
+    if (!userId) {
+        return res.status(400).send({ message: 'User ID is required' });
+    }
+
+    // Query to fetch the total water consumption for the user
+    const sql = 'SELECT total_ml_water FROM users WHERE id = ?';
     db.query(sql, [userId], (err, result) => {
         if (err) {
             console.error('Error fetching user data:', err);
             return res.status(500).send({ message: 'Error fetching user data' });
         }
 
+        // If user is not found
         if (result.length === 0) {
             return res.status(404).send({ message: 'User not found' });
         }
 
+        // Return the total water consumption for the user
         const totalWater = result[0].total_ml_water;
-        res.status(200).send({ total_ml_water: totalWater });
+        res.send({ total_ml_water: totalWater });
     });
 });
 
-// Route to serve the main HTML file
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+
+// API to add a user
+app.post('/api/add-user', (req, res) => {
+    const { username } = req.body;
+    if (!username) {
+        return res.status(400).send({ message: 'Username is required' });
+    }
+
+    const sql = 'INSERT INTO users (username) VALUES (?)';
+    db.query(sql, [username], (err, result) => {
+        if (err) {
+            console.error('Error adding user:', err);
+            return res.status(500).send({ message: 'Error adding user' });
+        }
+        res.send({ message: 'User added successfully' });
+    });
+});
+
+// API to delete a user
+app.delete('/api/delete-user', (req, res) => {
+    const { userId } = req.body;
+    if (!userId) {
+        return res.status(400).send({ message: 'User ID is required' });
+    }
+
+    const sql = 'DELETE FROM users WHERE id = ?';
+    db.query(sql, [userId], (err, result) => {
+        if (err) {
+            console.error('Error deleting user:', err);
+            return res.status(500).send({ message: 'Error deleting user' });
+        }
+        res.send({ message: 'User deleted successfully' });
+    });
+});
+
+// API to add a product
+app.post('/api/add-product', (req, res) => {
+    const { name, barcode, waterMl } = req.body;
+    if (!name || !barcode || !waterMl) {
+        return res.status(400).send({ message: 'Name, barcode, and water ml are required' });
+    }
+
+    const sql = 'INSERT INTO products (name, barcode, water_ml) VALUES (?, ?, ?)';
+    db.query(sql, [name, barcode, waterMl], (err, result) => {
+        if (err) {
+            console.error('Error adding product:', err);
+            return res.status(500).send({ message: 'Error adding product' });
+        }
+        res.send({ message: 'Product added successfully' });
+    });
+});
+
+// API to delete a product
+app.delete('/api/delete-product', (req, res) => {
+    const { barcode } = req.body;
+    if (!barcode) {
+        return res.status(400).send({ message: 'Barcode is required' });
+    }
+
+    const sql = 'DELETE FROM products WHERE barcode = ?';
+    db.query(sql, [barcode], (err, result) => {
+        if (err) {
+            console.error('Error deleting product:', err);
+            return res.status(500).send({ message: 'Error deleting product' });
+        }
+        res.send({ message: 'Product deleted successfully' });
+    });
 });
 
 // Start the server

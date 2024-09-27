@@ -16,7 +16,11 @@
     <p id="scanned-result"></p>
     <p id="total-water"></p>
 
+    <!-- Button to navigate to the manage page -->
+    <button onclick="window.location.href='/manage.html'">Manage Users and Products</button>
+
     <script>
+        // QR/Barcode scanning logic (similar to previous code)
         const userIdInput = document.getElementById('userId');
 
         function onScanSuccess(decodedText, decodedResult) {
@@ -27,13 +31,11 @@
                 return;
             }
 
-            const isQRCode = decodedResult.decodedText.includes('ml');  // Simple logic to detect QR code
-
             document.getElementById('scanned-result').innerText = `Scanned result: ${decodedText}`;
 
+            const isQRCode = decodedText.includes('ml'); // Simple detection for QR
             if (isQRCode) {
                 const waterMl = parseInt(decodedText);
-
                 fetch('/api/qr-scan', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

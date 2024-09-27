@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users and Products</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manage Users</h1>
+    <!-- Form to add a user -->
+    <form id="addUserForm">
+        <input type="text" id="username" placeholder="Enter username" required>
+        <button type="submit">Add User</button>
+    </form>
+
+    <!-- Form to delete a user -->
+    <form id="deleteUserForm">
+        <input type="number" id="userIdToDelete" placeholder="Enter User ID to delete" required>
+        <button type="submit">Delete User</button>
+    </form>
+
+    <h2>All Users</h2>
+    <table id="usersTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Water Level (ml)</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <h1>Manage Products</h1>
+    <!-- Form to add a product -->
+    <form id="addProductForm">
+        <input type="text" id="productName" placeholder="Enter product name" required>
+        <input type="text" id="barcode" placeholder="Enter barcode" required>
+        <input type="number" id="waterMl" placeholder="Enter water ml" required>
+        <button type="submit">Add Product</button>
+    </form>
+
+    <!-- Form to delete a product -->
+    <form id="deleteProductForm">
+        <input type="text" id="barcodeToDelete" placeholder="Enter Barcode to delete" required>
+        <button type="submit">Delete Product</button>
+    </form>
+
+    <h2>All Products</h2>
+    <table id="productsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Barcode</th>
+                <th>Water (ml)</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button onclick="window.location.href='/'">Back to Home</button>
+
+    <script>
+        // Fetch and display users and their water levels
+        function fetchUsers() {
+            fetch('/api/users')
+                .then(response => response.json())
+                .then(users => {
+                    const usersTable = document.getElementById('usersTable').querySelector('tbody');
+                    usersTable.innerHTML = ''; // Clear the table before adding new rows
+                    users.forEach(user => {
+                        // Fetch user water level
+                        fetch(`/api/user-water/${user.id}`)
+                            .then(response => response.json())
+                            .then(waterData => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `<td>${user.id}</td><td>${user.username}</td><td>${waterData.total_ml_water} ml</td>`;
+                                usersTable.appendChild(row);
+                            });
+                    });
+                });
+        }
+
+        // Fetch and display products
+        function fetchProducts() {
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(products => {
+                    const productsTable = document.getElementById('productsTable').querySelector('tbody');
+                    productsTable.innerHTML = ''; // Clear the table before adding new rows
+                    products.forEach(product => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td>${product.id}</td><td>${product.name}</td><td>${product.barcode}</td><td>${product.water_ml} ml</td>`;
+                        productsTable.appendChild(row);
+                    });
+                });
+        }
+
+        // Add user form submission
+        document.getElementById('addUserForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+
+            fetch('/api/add-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchUsers(); // Refresh the users list
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Delete user form submission
+        document.getElementById('deleteUserForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userId = document.getElementById('userIdToDelete').value;
+
+            fetch('/api/delete-user', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchUsers(); // Refresh the users list
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Add product form submission
+        document.getElementById('addProductForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('productName').value;
+            const barcode = document.getElementById('barcode').value;
+            const waterMl = document.getElementById('waterMl').value;
+
+            fetch('/api/add-product', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, barcode, waterMl })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchProducts(); // Refresh the products list
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Delete product form submission
+        document.getElementById('deleteProductForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const barcode = document.getElementById('barcodeToDelete').value;
+
+            fetch('/api/delete-product', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ barcode })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchProducts(); // Refresh the products list
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Fetch users and products on page load
+        fetchUsers();
+        fetchProducts();
+    </script>
+</body>
+</html>
