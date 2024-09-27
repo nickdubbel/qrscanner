@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR/Barcode Scanner</title>
-    <!-- <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> -->
+
+    <!-- Correct CDN for html5-qrcode -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
@@ -16,16 +17,28 @@
     <p id="scanned-result"></p>
     <p id="total-water"></p>
 
-    <!-- Button to navigate to the manage page -->
     <button onclick="window.location.href='/manage.html'">Manage Users and Products</button>
 
     <script>
-        // QR/Barcode scanning logic (similar to previous code)
-        const userIdInput = document.getElementById('userId');
+        let lastScanTime = 0; // Variable to store the last scan timestamp
 
+        // QR/Barcode scanner success callback
         function onScanSuccess(decodedText, decodedResult) {
-            const userId = userIdInput.value;
+            const userId = document.getElementById('userId').value;
+            
+            // Get the current timestamp
+            const currentTime = Date.now();
+            
+            // Check if 1 second has passed since the last scan
+            if (currentTime - lastScanTime < 1000) {
+                alert("You are scanning too fast. Please wait 1 second between scans.");
+                return;
+            }
 
+            // Update the lastScanTime to the current time
+            lastScanTime = currentTime;
+
+            // Ensure userId is provided
             if (!userId) {
                 alert('Please enter a User ID before scanning');
                 return;
@@ -33,9 +46,11 @@
 
             document.getElementById('scanned-result').innerText = `Scanned result: ${decodedText}`;
 
-            const isQRCode = decodedText.includes('ml'); // Simple detection for QR
+            // Handle barcode or QR code result
+            const isQRCode = decodedText.includes('ml'); // Simple detection for QR codes
             if (isQRCode) {
                 const waterMl = parseInt(decodedText);
+
                 fetch('/api/qr-scan', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -55,6 +70,7 @@
                 .catch(error => console.error('Error:', error));
             }
 
+            // Fetch and display total water consumption after the scan
             fetch(`/api/user-water/${userId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -66,8 +82,38 @@
             console.warn(`Code scan error: ${error}`);
         }
 
-        let html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, onScanSuccess, onScanFailure);
+        // Initialize the QR/barcode scanner
+        function initQrCodeScanner() {
+            let html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },  // Use rear camera
+                {
+                    fps: 10,     // Frames per second
+                    qrbox: 250   // Size of the scanning box
+                },
+                onScanSuccess,
+                onScanFailure
+            )
+            .catch(err => {
+                console.error("Unable to start scanning", err);
+                alert('Unable to start scanning. Make sure your camera is accessible.');
+            });
+        }
+
+        // Check if the camera permissions are available and ask for them if needed
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    // Camera is accessible, now initialize QR code scanner
+                    initQrCodeScanner();
+                })
+                .catch(function(err) {
+                    console.error('Camera permission denied:', err);
+                    alert('Camera access denied. Please allow the camera to scan QR codes or barcodes.');
+                });
+        } else {
+            alert('Camera not available or not supported in your browser.');
+        }
     </script>
 </body>
 </html>
