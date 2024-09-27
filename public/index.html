@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR/Barcode Scanner</title>
+    <!-- <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+    <h1>Scan QR or Barcode</h1>
+    <label for="userId">User ID:</label>
+    <input type="number" id="userId" placeholder="Enter User ID" />
+
+    <div id="reader" style="width: 500px;"></div>
+    <p id="scanned-result"></p>
+    <p id="total-water"></p>
+
+    <script>
+        const userIdInput = document.getElementById('userId');
+
+        function onScanSuccess(decodedText, decodedResult) {
+            const userId = userIdInput.value;
+
+            if (!userId) {
+                alert('Please enter a User ID before scanning');
+                return;
+            }
+
+            const isQRCode = decodedResult.decodedText.includes('ml');  // Simple logic to detect QR code
+
+            document.getElementById('scanned-result').innerText = `Scanned result: ${decodedText}`;
+
+            if (isQRCode) {
+                const waterMl = parseInt(decodedText);
+
+                fetch('/api/qr-scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, waterMl })
+                })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+            } else {
+                fetch('/api/barcode-scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, barcode: decodedText })
+                })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+            }
+
+            fetch(`/api/user-water/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('total-water').innerText = `Total water consumed: ${data.total_ml_water} ml`;
+                });
+        }
+
+        function onScanFailure(error) {
+            console.warn(`Code scan error: ${error}`);
+        }
+
+        let html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, onScanSuccess, onScanFailure);
+    </script>
+</body>
+</html>
