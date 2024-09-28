@@ -31,7 +31,7 @@
     
             // Check if 1 second has passed since the last scan
             if (currentTime - lastScanTime < 1000) {
-                alert("You are scanning too fast. Please wait 1 second between scans.");
+                // Prevent rapid consecutive scans
                 return;
             }
     
@@ -45,14 +45,23 @@
             }
     
             document.getElementById('scanned-result').innerText = `Scanned result: ${decodedText}`;
-    
-            // Assuming the QR code contains a JSON string with `name` and `water_ml`
+
+            // Distinguish between QR code (JSON format) and Barcode (raw text/numbers)
             try {
+                // Try to parse the scanned text as JSON for QR code
                 const qrData = JSON.parse(decodedText); // Parse the QR data
+
+                // print qr data
+                console.log(qrData);
+
+                // if the qr data is not in the correct format, catch the error
+                if (!qrData.name || !qrData.water_ml) {
+                    throw new Error('Invalid QR code data');
+                }
     
                 const { name, water_ml } = qrData; // Extract the name and water_ml fields
     
-                // Send data to the backend via the /api/qr-scan endpoint
+                // Send QR data to the backend via the /api/qr-scan endpoint
                 fetch('/api/qr-scan', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -68,9 +77,26 @@
                     alert(data.message); // Show a success message
                 })
                 .catch(error => console.error('Error:', error));
+
             } catch (err) {
-                console.error('Error parsing QR code data:', err);
-                alert('Invalid QR code data format');
+                // If the scanned data is not JSON (i.e., it's a barcode), handle it as a barcode
+                console.log('Scanned text is not a QR code, treating as a barcode.');
+
+                // Send barcode data to the backend via the /api/barcode-scan endpoint
+                fetch('/api/barcode-scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userId,
+                        barcode: decodedText // Send the barcode as is
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    alert(data.message); // Show a success message
+                })
+                .catch(error => console.error('Error:', error));
             }
     
             // Fetch and display total water consumption after the scan
