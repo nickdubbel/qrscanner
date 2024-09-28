@@ -21,55 +21,58 @@
 
     <script>
         let lastScanTime = 0; // Variable to store the last scan timestamp
-
+    
         // QR/Barcode scanner success callback
         function onScanSuccess(decodedText, decodedResult) {
             const userId = document.getElementById('userId').value;
-            
+    
             // Get the current timestamp
             const currentTime = Date.now();
-            
+    
             // Check if 1 second has passed since the last scan
             if (currentTime - lastScanTime < 1000) {
                 alert("You are scanning too fast. Please wait 1 second between scans.");
                 return;
             }
-
+    
             // Update the lastScanTime to the current time
             lastScanTime = currentTime;
-
+    
             // Ensure userId is provided
             if (!userId) {
                 alert('Please enter a User ID before scanning');
                 return;
             }
-
+    
             document.getElementById('scanned-result').innerText = `Scanned result: ${decodedText}`;
-
-            // Handle barcode or QR code result
-            const isQRCode = decodedText.includes('ml'); // Simple detection for QR codes
-            if (isQRCode) {
-                const waterMl = parseInt(decodedText);
-
+    
+            // Assuming the QR code contains a JSON string with `name` and `water_ml`
+            try {
+                const qrData = JSON.parse(decodedText); // Parse the QR data
+    
+                const { name, water_ml } = qrData; // Extract the name and water_ml fields
+    
+                // Send data to the backend via the /api/qr-scan endpoint
                 fetch('/api/qr-scan', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, waterMl })
+                    body: JSON.stringify({
+                        userId: userId,
+                        name: name,      // Product name from QR code
+                        water_ml: water_ml // Water amount from QR code
+                    })
                 })
                 .then(response => response.json())
-                .then(data => console.log(data))
-                .catch(error => console.error('Error:', error));
-            } else {
-                fetch('/api/barcode-scan', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, barcode: decodedText })
+                .then(data => {
+                    console.log(data);
+                    alert(data.message); // Show a success message
                 })
-                .then(response => response.json())
-                .then(data => console.log(data))
                 .catch(error => console.error('Error:', error));
+            } catch (err) {
+                console.error('Error parsing QR code data:', err);
+                alert('Invalid QR code data format');
             }
-
+    
             // Fetch and display total water consumption after the scan
             fetch(`/api/user-water/${userId}`)
                 .then(response => response.json())
@@ -77,11 +80,11 @@
                     document.getElementById('total-water').innerText = `Total water consumed: ${data.total_ml_water} ml`;
                 });
         }
-
+    
         function onScanFailure(error) {
             console.warn(`Code scan error: ${error}`);
         }
-
+    
         // Initialize the QR/barcode scanner
         function initQrCodeScanner() {
             let html5QrCode = new Html5Qrcode("reader");
@@ -99,7 +102,7 @@
                 alert('Unable to start scanning. Make sure your camera is accessible.');
             });
         }
-
+    
         // Check if the camera permissions are available and ask for them if needed
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({ video: true })
@@ -115,5 +118,6 @@
             alert('Camera not available or not supported in your browser.');
         }
     </script>
+    
 </body>
 </html>

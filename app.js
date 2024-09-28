@@ -97,6 +97,39 @@ app.post('/api/barcode-scan', (req, res) => {
     });
 });
 
+// API to handle QR code scanning and update user's water consumption
+app.post('/api/qr-scan', (req, res) => {
+    const { userId, name, water_ml } = req.body;
+
+    // Check if userId, name, and water_ml are provided
+    if (!userId || !name || !water_ml) {
+        return res.status(400).send({ message: 'User ID, product name, and water amount are required' });
+    }
+
+    // Convert water_ml to a number to avoid injection and parsing issues
+    const waterMl = parseFloat(water_ml);
+    if (isNaN(waterMl) || waterMl <= 0) {
+        return res.status(400).send({ message: 'Invalid water amount' });
+    }
+
+    // Query to update the user's total water consumption
+    const updateUserQuery = 'UPDATE users SET total_ml_water = total_ml_water + ? WHERE id = ?';
+    db.query(updateUserQuery, [waterMl, userId], (err, result) => {
+        if (err) {
+            console.error('Error updating user water intake:', err);
+            return res.status(500).send({ message: 'Error updating user water intake' });
+        }
+
+        // If user does not exist
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+
+        // Success: Respond with the updated water intake
+        res.send({ message: `Successfully added ${waterMl} ml to user ${userId}` });
+    });
+});
+
 
 // API to get the total water consumption of a user by their ID
 app.get('/api/user-water/:userId', (req, res) => {
