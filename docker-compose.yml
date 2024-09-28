@@ -1,0 +1,40 @@
+version: '3.3'
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'scanner_db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    volumes:
+      - db-data:/var/lib/mysql  # Persistent storage for MySQL data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro  # SQL file to initialize the database
+    networks:
+      - app-network
+
+  app:
+    image: nickdubbel/qrscanner
+    container_name: node-app
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db  # Referencing the 'db' service name
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: scanner_db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:
