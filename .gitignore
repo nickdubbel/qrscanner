@@ -1,2 +1,6 @@
+node_modules/
+
+
+# generated files from python
 barcodes/
 qrcodes/
