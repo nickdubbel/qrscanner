@@ -16,7 +16,8 @@ services:
       - app-network
 
   app:
-    image: nickdubbel/qrscanner
+    build:
+      context: .  # This tells Docker to build the image from the Dockerfile in the current directory
     container_name: node-app
     restart: always
     ports:
