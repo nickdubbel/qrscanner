@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS Employee (
 );
 
 -- Create the `log` table
-CREATE TABLE IF NOT EXISTS Log (
+CREATE TABLE IF NOT EXISTS Logs (
     input_user_id INT NOT NULL,
     patient_id INT NOT NULL,
     time TIME NOT NULL,
@@ -72,11 +72,11 @@ INSERT INTO users (username) VALUES
 ('Mike');
 
 -- Insert sample employee
-INSERT INTO employee (first_name, last_name, date_of_birth) VALUES
+INSERT INTO Employee (first_name, last_name, date_of_birth) VALUES
 ('System', 'Admin', '2000-01-01');
 
 -- Insert sample log entries
-INSERT INTO log (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount) VALUES
+INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount) VALUES
 (1, 126942, '09:08:00', '2024-10-07', 13, 'lunch', 1),
 (1, 126942, '09:08:00', '2024-10-07', 17, 'lunch', 1),
 (1, 126942, '18:18:00', '2024-10-07', 14, 'dinner', 1),
