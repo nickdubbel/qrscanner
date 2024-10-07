@@ -4,10 +4,17 @@ const mysql = require('mysql2');
 const path = require('path');
 const apiRoutes = require('./apiRoutes'); // Import the apiRoutes module
 
+
+// Enable CORS for all routes
+const cors = require('cors');
+
 // Create Express App
 const app = express();
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files like HTML, CSS, JS
+
+// Enable CORS for all routes
+app.use(cors());
 
 // MySQL connection configuration
 const dbConfig = {

@@ -208,5 +208,40 @@ module.exports = function (db) {
         });
     });
 
+    router.get('/logs', async (req, res) => {
+        const { patient_id } = req.query;
+
+        if (!patient_id) {
+            return res.status(400).send({ message: 'User ID is required' });
+        }
+        
+        const sql = 'SELECT * FROM Logs WHERE patient_id = ?';
+        db.query(sql, [patient_id], (err, result) => {
+            if (err) {
+                console.error('Error fetching logs:', err);
+                return res.status(500).send({ message: 'Error fetching logs' });
+            }
+            res.send(result);
+        });
+        
+        // const logs = await db.query('SELECT * FROM Log WHERE patient_id = ?', [patient_id]);
+        // res.json(logs);
+    });
+    
+    router.get('/nutrition', async (req, res) => {
+
+        const sql = 'SELECT * FROM NutritionValues';
+        db.query(sql, (err, result) => {
+            if (err) {
+                console.error('Error fetching nutrition:', err);
+                return res.status(500).send({ message: 'Error fetching nutrition' });
+            }
+            res.send(result);
+        });
+        // const nutrition = await db.query('SELECT * FROM NutritionValues');
+        // res.json(nutrition);
+    });
+    
+
     return router; // Return the router object with all defined routes
 };
