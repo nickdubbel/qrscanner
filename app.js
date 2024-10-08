@@ -14,11 +14,26 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files like HTML, CSS, JS
 
 // Enable CORS for all routes
-// app.use(cors());
+// Define allowed origins
+const allowedOrigins = ['http://localhost:8000', 'https://mikesegers.github.io'];
+
+// Configure CORS middleware to allow the two origins
 app.use(cors({
-    origin: 'http://localhost:8000', // Allow requests from this origin
-    credentials: true // Allow cookies if needed
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true); // Origin is allowed
+        } else {
+            callback(new Error('Not allowed by CORS')); // Origin is not allowed
+        }
+    },
+    credentials: true // Allow credentials (cookies, authorization headers, etc.)
 }));
+
+// Enable preflight requests for all routes
+app.options('*', cors()); // For handling preflight requests (OPTIONS)
 
 // MySQL connection configuration
 const dbConfig = {
