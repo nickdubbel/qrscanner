@@ -275,6 +275,23 @@ module.exports = function (db) {
         });
     });
 
+    // API to add to log
+    router.post('/add-log', (req, res) => {
+        const { input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount } = req.body;
+        if (!input_user_id || !patient_id || !time || !date || !nutrition_id || !category || !corrected_amount) {
+            return res.status(400).send({ message: 'Not all fields were added correctly' });
+        }
+
+        const sql = 'INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        db.query(sql, [input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount], (err, result) => {
+            if (err) {
+                console.error('Error adding product:', err);
+                return res.status(500).send({ message: 'Error adding product' });
+            }
+            res.send({ message: 'Log added successfully' });
+        });
+    });
+
     
 
     return router; // Return the router object with all defined routes
