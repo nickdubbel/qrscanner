@@ -224,8 +224,6 @@ module.exports = function (db) {
             res.send(result);
         });
         
-        // const logs = await db.query('SELECT * FROM Log WHERE patient_id = ?', [patient_id]);
-        // res.json(logs);
     });
     
     router.get('/nutrition', async (req, res) => {
@@ -238,9 +236,45 @@ module.exports = function (db) {
             }
             res.send(result);
         });
-        // const nutrition = await db.query('SELECT * FROM NutritionValues');
-        // res.json(nutrition);
+
     });
+
+    // Fetch a specific patient's data
+    router.get('/patients', async (req, res) => {
+        const { patient_id } = req.query;
+
+        if (!patient_id) {
+            return res.status(400).send({ message: 'Patient ID is required' });
+        }
+
+        const sql = 'SELECT * FROM Patients WHERE patient_id = ?';
+        db.query(sql, [patient_id], (err, result) => {
+            if (err) {
+                console.error('Error fetching patient data:', err);
+                return res.status(500).send({ message: 'Error fetching patient data' });
+            }
+            res.send(result);
+        });
+    });
+
+    // Fetch patients by room number and state (e.g., active)
+    router.get('/roomnumber', async (req, res) => {
+        const { roomnumber, state } = req.query;
+
+        if (!roomnumber || !state) {
+            return res.status(400).send({ message: 'Room number and state are required' });
+        }
+
+        const sql = 'SELECT * FROM Patients WHERE roomnumber = ? AND state = ?';
+        db.query(sql, [roomnumber, state], (err, result) => {
+            if (err) {
+                console.error('Error fetching patient data:', err);
+                return res.status(500).send({ message: 'Error fetching patient data' });
+            }
+            res.send(result);
+        });
+    });
+
     
 
     return router; // Return the router object with all defined routes
