@@ -14,7 +14,11 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files like HTML, CSS, JS
 
 // Enable CORS for all routes
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:8000', // Allow requests from this origin
+    credentials: true // Allow cookies if needed
+}));
 
 // MySQL connection configuration
 const dbConfig = {
