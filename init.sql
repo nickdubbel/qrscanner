@@ -114,14 +114,10 @@ INSERT INTO NutritionValues (dish, calories, protein, carbs, fats, salt, water) 
 ('pasta', 350, 10, 60, 8, 3, 200),
 ('apple', 95, 0.5, 25, 0.3, 0, 150),
 ('yogurt', 120, 5, 15, 4, 0.8, 180),
-('water', 0, 0, 0, 0, 0, 1000),
+('water', 0, 0, 0, 0, 0, 250),
 ('soda', 150, 0, 40, 0, 0.2, 300),
 ('orange juice', 112, 2, 26, 0.5, 0.3, 280),
-('IV', 0, 0, 0, 0, 0, 1000),
-('Blood', 0, 0, 0, 0, 0, -1000),
-('Stool', 0, 0, 0, 0, 0, -1000),
-('Vomit', 0, 0, 0, 0, 0, -1000),
-('Urine', 0, 0, 0, 0, 0, -1000);
+('IV', 0, 0, 0, 0, 0, 1000);
 
 
 -- Insert sample patients
