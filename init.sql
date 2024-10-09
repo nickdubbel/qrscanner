@@ -52,7 +52,8 @@ CREATE TABLE IF NOT EXISTS NutritionValues (
     carbs DECIMAL(5,2) NOT NULL,
     fats DECIMAL(5,2) NOT NULL,
     salt DECIMAL(5,2) NOT NULL,
-    water INT NOT NULL
+    water INT NOT NULL,
+    protected BOOLEAN NOT NULL
 );
 
 -- Create the `Patients` table
@@ -98,26 +99,26 @@ INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category,
 
 -- Insert sample nutrition values
 INSERT INTO NutritionValues (dish, calories, protein, carbs, fats, salt, water) VALUES
-('asparagus', 20, 2.2, 3.7, 0.2, 1, 200),
-('broccoli', 55, 3.7, 11.2, 0.6, 2, 100),
-('burrito', 400, 18, 50, 16, 1, 200),
-('chicken', 335, 25, 0, 25, 1, 200),
-('egg', 155, 13, 1.1, 11, 1, 200),
-('mie', 180, 7, 35, 2, 1, 200),
-('noodles', 200, 8, 40, 2, 1, 200),
-('potato', 130, 2.2, 30, 0.2, 1, 200),
-('salad', 100, 2, 10, 5, 1, 200),
-('salmon', 206, 22, 0, 13, 1, 200),
-('sweetpotato', 86, 1.6, 20, 0.1, 1, 200),
-('vegetables', 50, 2, 10, 0.5, 0, 500),
-('sandwich', 300, 12, 35, 12, 2, 100),
-('pasta', 350, 10, 60, 8, 3, 200),
-('apple', 95, 0.5, 25, 0.3, 0, 150),
-('yogurt', 120, 5, 15, 4, 0.8, 180),
-('water', 0, 0, 0, 0, 0, 250),
-('soda', 150, 0, 40, 0, 0.2, 300),
-('orange juice', 112, 2, 26, 0.5, 0.3, 280),
-('IV', 0, 0, 0, 0, 0, 1000);
+('asparagus', 20, 2.2, 3.7, 0.2, 1, 200, 1),
+('broccoli', 55, 3.7, 11.2, 0.6, 2, 100, 1),
+('burrito', 400, 18, 50, 16, 1, 200, 1),
+('chicken', 335, 25, 0, 25, 1, 200, 1),
+('egg', 155, 13, 1.1, 11, 1, 200, 1),
+('mie', 180, 7, 35, 2, 1, 200, 1),
+('noodles', 200, 8, 40, 2, 1, 200, 1),
+('potato', 130, 2.2, 30, 0.2, 1, 200, 1),
+('salad', 100, 2, 10, 5, 1, 200, 1),
+('salmon', 206, 22, 0, 13, 1, 200, 1),
+('sweetpotato', 86, 1.6, 20, 0.1, 1, 200, 1),
+('vegetables', 50, 2, 10, 0.5, 0, 500, 1),
+('sandwich', 300, 12, 35, 12, 2, 100, 1),
+('pasta', 350, 10, 60, 8, 3, 200, 1),
+('apple', 95, 0.5, 25, 0.3, 0, 150, 1),
+('yogurt', 120, 5, 15, 4, 0.8, 180, 1),
+('water', 0, 0, 0, 0, 0, 250, 0),
+('soda', 150, 0, 40, 0, 0.2, 300, 1),
+('orange juice', 112, 2, 26, 0.5, 0.3, 280, 1),
+('IV', 0, 0, 0, 0, 0, 1000, 1);
 
 
 -- Insert sample patients
