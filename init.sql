@@ -31,7 +31,16 @@ CREATE TABLE IF NOT EXISTS Logs (
     nutrition_id INT NOT NULL,
     category VARCHAR(255) NOT NULL,
     corrected_amount DOUBLE NOT NULL,
-    FOREIGN KEY (input_user_id) REFERENCES users(id)
+);
+
+-- Create the `log_out` table
+CREATE TABLE IF NOT EXISTS LogsOut (
+    input_user_id INT NOT NULL,
+    patient_id INT NOT NULL,
+    time TIME NOT NULL,
+    date DATE NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    amount DOUBLE NOT NULL,
 );
 
 -- Create the `NutritionValues` table
