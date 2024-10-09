@@ -98,7 +98,7 @@ INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category,
 (1, 126944, '13:47:00', '2024-10-07', 18, 'drinks', 1);
 
 -- Insert sample nutrition values
-INSERT INTO NutritionValues (dish, calories, protein, carbs, fats, salt, water) VALUES
+INSERT INTO NutritionValues (dish, calories, protein, carbs, fats, salt, water, protected) VALUES
 ('asparagus', 20, 2.2, 3.7, 0.2, 1, 200, 1),
 ('broccoli', 55, 3.7, 11.2, 0.6, 2, 100, 1),
 ('burrito', 400, 18, 50, 16, 1, 200, 1),
