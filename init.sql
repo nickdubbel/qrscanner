@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS Logs (
     date DATE NOT NULL,
     nutrition_id INT NOT NULL,
     category VARCHAR(255) NOT NULL,
-    corrected_amount DOUBLE NOT NULL,
+    corrected_amount DOUBLE NOT NULL
 );
 
 -- Create the `log_out` table
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS LogsOut (
     time TIME NOT NULL,
     date DATE NOT NULL,
     category VARCHAR(255) NOT NULL,
-    amount DOUBLE NOT NULL,
+    amount DOUBLE NOT NULL
 );
 
 -- Create the `NutritionValues` table
