@@ -225,6 +225,24 @@ module.exports = function (db) {
         });
         
     });
+
+    router.get('/logsOut', async (req, res) => {
+        const { patient_id } = req.query;
+
+        if (!patient_id) {
+            return res.status(400).send({ message: 'User ID is required' });
+        }
+        
+        const sql = 'SELECT * FROM LogsOut WHERE patient_id = ?';
+        db.query(sql, [patient_id], (err, result) => {
+            if (err) {
+                console.error('Error fetching logs:', err);
+                return res.status(500).send({ message: 'Error fetching logs' });
+            }
+            res.send(result);
+        });
+        
+    });
     
     router.get('/nutrition', async (req, res) => {
 
