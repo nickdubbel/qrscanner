@@ -285,10 +285,28 @@ module.exports = function (db) {
         const sql = 'INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount) VALUES (?, ?, ?, ?, ?, ?, ?)';
         db.query(sql, [input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount], (err, result) => {
             if (err) {
-                console.error('Error adding product:', err);
-                return res.status(500).send({ message: 'Error adding product' });
+                console.error('Error adding log:', err);
+                return res.status(500).send({ message: 'Error adding log' });
             }
             res.send({ message: 'Log added successfully' });
+        });
+    });
+
+
+    // API to add to log
+    router.post('/add-logOut', (req, res) => {
+        const { input_user_id, patient_id, time, date, category, amount } = req.body;
+        if (!input_user_id || !patient_id || !time || !date|| !category || !amount) {
+            return res.status(400).send({ message: 'Not all fields were added correctly' });
+        }
+
+        const sql = 'INSERT INTO LogsOut (input_user_id, patient_id, time, date, category, amount) VALUES (?, ?, ?, ?, ?, ?)';
+        db.query(sql, [input_user_id, patient_id, time, date, category, amount], (err, result) => {
+            if (err) {
+                console.error('Error adding logOut:', err);
+                return res.status(500).send({ message: 'Error adding logOut' });
+            }
+            res.send({ message: 'LogOut added successfully' });
         });
     });
 
