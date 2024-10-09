@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS Logs (
     date DATE NOT NULL,
     nutrition_id INT NOT NULL,
     category VARCHAR(255) NOT NULL,
-    corrected_amount INT NOT NULL,
+    corrected_amount DOUBLE NOT NULL,
     FOREIGN KEY (input_user_id) REFERENCES users(id)
 );
 
