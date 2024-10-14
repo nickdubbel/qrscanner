@@ -95,7 +95,7 @@ module.exports = function (db) {
         });
     });
 
-    // API to get total water consumption of a user by their ID
+   // API to get total water consumption of a user by their ID
     router.get('/user-water/:userId', (req, res) => {
         const userId = req.params.userId;
 
@@ -103,15 +103,21 @@ module.exports = function (db) {
             return res.status(400).send({ message: 'User ID is required' });
         }
 
-        const sql = 'SELECT total_ml_water FROM users WHERE id = ?';
+        // Updated SQL to fetch total water consumption using the new database structure
+        const sql = `
+            SELECT SUM(NV.water * L.corrected_amount) AS total_ml_water
+            FROM Logs L
+            INNER JOIN NutritionValues NV ON L.nutrition_id = NV.id
+            WHERE L.patient_id = ?`;
+
         db.query(sql, [userId], (err, result) => {
             if (err) {
                 console.error('Error fetching user data:', err);
                 return res.status(500).send({ message: 'Error fetching user data' });
             }
 
-            if (result.length === 0) {
-                return res.status(404).send({ message: 'User not found' });
+            if (result.length === 0 || result[0].total_ml_water === null) {
+                return res.status(404).send({ message: 'User not found or no water consumption data available' });
             }
 
             const totalWater = result[0].total_ml_water;
