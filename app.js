@@ -29,6 +29,7 @@ app.use(cors({
             callback(new Error('Not allowed by CORS')); // Origin is not allowed
         }
     },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Include DELETE method explicitly
     credentials: true // Allow credentials (cookies, authorization headers, etc.)
 }));
 
