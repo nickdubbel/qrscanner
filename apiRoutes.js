@@ -298,7 +298,7 @@ router.delete('/deleteLog', (req, res) => {
         return res.status(400).send({ message: 'Log ID is required to delete the log' });
     }
 
-    const sql = 'DELETE FROM Logs WHERE log_id = ?';
+    const sql = 'DELETE FROM Logs WHERE id = ?';
     db.query(sql, [log_id], (err, result) => {
         if (err) {
             console.error('Error deleting log:', err);
