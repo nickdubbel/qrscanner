@@ -2,89 +2,68 @@ const express = require('express');
 const router = express.Router(); // Create a router object to define routes
 
 module.exports = function (db) {
-    // API to fetch all users
-    router.get('/users', (req, res) => {
-        const sql = 'SELECT id, username FROM users';
-        db.query(sql, (err, result) => {
-            if (err) {
-                console.error('Error fetching users:', err);
-                return res.status(500).send({ message: 'Error fetching users' });
-            }
-            res.send(result);
-        });
-    });
-
-    // API to fetch all products
-    router.get('/products', (req, res) => {
-        const sql = 'SELECT id, name, barcode, water_ml FROM products';
-        db.query(sql, (err, result) => {
-            if (err) {
-                console.error('Error fetching products:', err);
-                return res.status(500).send({ message: 'Error fetching products' });
-            }
-            res.send(result);
-        });
-    });
-
-    // API to handle barcode scanning and update user's water consumption
+ 
+    // API to handle barcode scanning and log nutrition values
     router.post('/barcode-scan', (req, res) => {
-        const { userId, barcode } = req.body;
+        const { userId, inputUserId, barcode } = req.body;
+        if (!userId || !barcode || !inputUserId) return res.status(400).send({ message: 'User ID and barcode are required' });
 
-        if (!userId || !barcode) {
-            return res.status(400).send({ message: 'User ID and barcode are required' });
-        }
+        db.query('SELECT NV.id, NV.dish FROM NutritionValues NV INNER JOIN Barcodes B ON NV.id = B.nutrition_id WHERE B.barcode = ?', [barcode], (err, productResult) => {
+            if (err) return res.status(500).send({ message: 'Error fetching product data' });
+            if (productResult.length === 0) return res.status(404).send({ message: 'Product not found' });
 
-        const productQuery = 'SELECT water_ml FROM products WHERE barcode = ?';
-        db.query(productQuery, [barcode], (err, productResult) => {
-            if (err) {
-                console.error('Error fetching product by barcode:', err);
-                return res.status(500).send({ message: 'Error fetching product data' });
-            }
+            const { id: nutritionId, dish } = productResult[0];
+            const currentTime = new Date();
+            const logData = [inputUserId, userId, currentTime.toTimeString().split(' ')[0], currentTime.toISOString().split('T')[0], nutritionId, 'barcode-scan', 1];
 
-            if (productResult.length === 0) {
-                return res.status(404).send({ message: 'Product not found' });
-            }
-
-            const waterMl = productResult[0].water_ml;
-
-            const updateUserQuery = 'UPDATE users SET total_ml_water = total_ml_water + ? WHERE id = ?';
-            db.query(updateUserQuery, [waterMl, userId], (err, updateResult) => {
-                if (err) {
-                    console.error('Error updating user water intake:', err);
-                    return res.status(500).send({ message: 'Error updating user water intake' });
-                }
-
-                res.send({ message: `Successfully added ${waterMl} ml to user ${userId}` });
+            db.query('INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount) VALUES (?, ?, ?, ?, ?, ?, ?)', logData, (err) => {
+                if (err) return res.status(500).send({ message: 'Error logging nutrition values' });
+                res.send({ message: `Successfully logged nutrition values for product ${dish} for user ${userId}` });
             });
         });
     });
 
     // API to handle QR code scanning and update user's water consumption
     router.post('/qr-scan', (req, res) => {
-        const { userId, name, water_ml } = req.body;
+        const { userId, inputUserId, name, water_ml, isIn } = req.body;
 
-        if (!userId || !name || !water_ml) {
-            return res.status(400).send({ message: 'User ID, product name, and water amount are required' });
+        // Validate required fields
+        if (!userId || !name || inputUserId === undefined || isIn === undefined) {
+            return res.status(400).send({ message: 'User ID, product name, input user ID, and fluid direction are required' });
         }
 
-        const waterMl = parseFloat(water_ml);
-        if (isNaN(waterMl) || waterMl <= 0) {
-            return res.status(400).send({ message: 'Invalid water amount' });
+        let waterMl = isIn ? (water_ml ? parseFloat(water_ml) : 1) : parseFloat(water_ml);
+
+        if (!isIn && (isNaN(waterMl) || waterMl <= 0)) {
+            return res.status(400).send({ message: 'Water amount is required for outgoing fluids and must be a valid number' });
         }
 
-        const updateUserQuery = 'UPDATE users SET total_ml_water = total_ml_water + ? WHERE id = ?';
-        db.query(updateUserQuery, [waterMl, userId], (err, result) => {
-            if (err) {
-                console.error('Error updating user water intake:', err);
-                return res.status(500).send({ message: 'Error updating user water intake' });
-            }
+        const currentTime = new Date();
+        const time = currentTime.toTimeString().split(' ')[0];
+        const date = currentTime.toISOString().split('T')[0];
 
-            if (result.affectedRows === 0) {
-                return res.status(404).send({ message: 'User not found' });
-            }
+        if (isIn) {
+            // Handle fluid intake
+            db.query('SELECT id FROM NutritionValues WHERE dish = ?', [name], (err, productResult) => {
+                if (err) return res.status(500).send({ message: 'Error fetching product data' });
+                if (productResult.length === 0) return res.status(404).send({ message: 'Product not found' });
 
-            res.send({ message: `Successfully added ${waterMl} ml to user ${userId}` });
-        });
+                const nutritionId = productResult[0].id;
+                const logData = [inputUserId, userId, time, date, nutritionId, 'qr-scan', waterMl];
+
+                db.query('INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount) VALUES (?, ?, ?, ?, ?, ?, ?)', logData, (err) => {
+                    if (err) return res.status(500).send({ message: 'Error logging nutrition values' });
+                    res.send({ message: `Successfully logged nutrition values for product ${name} for user ${userId}` });
+                });
+            });
+        } else {
+            // Handle fluid output
+            const logOutData = [inputUserId, userId, time, date, name, waterMl];
+            db.query('INSERT INTO LogsOut (input_user_id, patient_id, time, date, category, amount) VALUES (?, ?, ?, ?, ?, ?)', logOutData, (err) => {
+                if (err) return res.status(500).send({ message: 'Error logging output values' });
+                res.send({ message: `Successfully logged ${waterMl} ml output for user ${userId}` });
+            });
+        }
     });
 
     // API to handle QR code scanning and update user's water consumption
@@ -140,73 +119,6 @@ module.exports = function (db) {
         });
     });
 
-    // API to add a user
-    router.post('/add-user', (req, res) => {
-        const { username } = req.body;
-        if (!username) {
-            return res.status(400).send({ message: 'Username is required' });
-        }
-
-        const sql = 'INSERT INTO users (username) VALUES (?)';
-        db.query(sql, [username], (err, result) => {
-            if (err) {
-                console.error('Error adding user:', err);
-                return res.status(500).send({ message: 'Error adding user' });
-            }
-            res.send({ message: 'User added successfully' });
-        });
-    });
-
-    // API to delete a user
-    router.delete('/delete-user', (req, res) => {
-        const { userId } = req.body;
-        if (!userId) {
-            return res.status(400).send({ message: 'User ID is required' });
-        }
-
-        const sql = 'DELETE FROM users WHERE id = ?';
-        db.query(sql, [userId], (err, result) => {
-            if (err) {
-                console.error('Error deleting user:', err);
-                return res.status(500).send({ message: 'Error deleting user' });
-            }
-            res.send({ message: 'User deleted successfully' });
-        });
-    });
-
-    // API to add a product
-    router.post('/add-product', (req, res) => {
-        const { name, barcode, waterMl } = req.body;
-        if (!name || !barcode || !waterMl) {
-            return res.status(400).send({ message: 'Name, barcode, and water ml are required' });
-        }
-
-        const sql = 'INSERT INTO products (name, barcode, water_ml) VALUES (?, ?, ?)';
-        db.query(sql, [name, barcode, waterMl], (err, result) => {
-            if (err) {
-                console.error('Error adding product:', err);
-                return res.status(500).send({ message: 'Error adding product' });
-            }
-            res.send({ message: 'Product added successfully' });
-        });
-    });
-
-    // API to delete a product
-    router.delete('/delete-product', (req, res) => {
-        const { barcode } = req.body;
-        if (!barcode) {
-            return res.status(400).send({ message: 'Barcode is required' });
-        }
-
-        const sql = 'DELETE FROM products WHERE barcode = ?';
-        db.query(sql, [barcode], (err, result) => {
-            if (err) {
-                console.error('Error deleting product:', err);
-                return res.status(500).send({ message: 'Error deleting product' });
-            }
-            res.send({ message: 'Product deleted successfully' });
-        });
-    });
 
     router.get('/logs', async (req, res) => {
         const { patient_id } = req.query;
@@ -327,6 +239,23 @@ module.exports = function (db) {
             res.send({ message: 'LogOut added successfully' });
         });
     });
+
+    // get the barcodes
+    app.get('/get-products', (req, res) => {
+        const query = `
+          SELECT B.barcode, NV.dish AS name, NV.water 
+          FROM Barcodes B 
+          INNER JOIN NutritionValues NV ON B.nutrition_id = NV.id`;
+      
+        db.query(query, (err, results) => {
+          if (err) {
+            console.error('Error fetching products:', err);
+            return res.status(500).json({ error: 'Error fetching product data' });
+          }
+      
+          res.status(200).json(results);
+        });
+      });
 
     return router; // Return the router object with all defined routes
 };

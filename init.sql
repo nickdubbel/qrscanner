@@ -1,19 +1,3 @@
--- Create the `users` table
-CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    total_ml_water INT DEFAULT 0,
-    last_scan_time TIMESTAMP NULL DEFAULT NULL
-);
-
--- Create the `products` table
-CREATE TABLE IF NOT EXISTS products (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    barcode VARCHAR(255) UNIQUE NOT NULL,
-    water_ml INT NOT NULL
-);
-
 -- Create the `employee` table
 CREATE TABLE IF NOT EXISTS Employee (
     employee_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,7 +27,7 @@ CREATE TABLE IF NOT EXISTS LogsOut (
     amount DOUBLE NOT NULL
 );
 
--- Create the `NutritionValues` table
+-- Create the `NutritionValues` table without barcode column
 CREATE TABLE IF NOT EXISTS NutritionValues (
     id INT AUTO_INCREMENT PRIMARY KEY,
     dish VARCHAR(255) NOT NULL,
@@ -56,6 +40,13 @@ CREATE TABLE IF NOT EXISTS NutritionValues (
     protected BOOLEAN NOT NULL
 );
 
+-- Create the `Barcodes` table
+CREATE TABLE IF NOT EXISTS Barcodes (
+    nutrition_id INT PRIMARY KEY,
+    barcode VARCHAR(255),
+    FOREIGN KEY (nutrition_id) REFERENCES NutritionValues(id)
+);
+
 -- Create the `Patients` table
 CREATE TABLE IF NOT EXISTS Patients (
     roomnumber INT NOT NULL,
@@ -66,20 +57,6 @@ CREATE TABLE IF NOT EXISTS Patients (
     max_fluid_intake INT NOT NULL,
     state VARCHAR(255) NOT NULL
 );
-
--- Insert sample products (optional)
-INSERT INTO products (name, barcode, water_ml) VALUES
-('Coca-Cola 500ml', '123456789012', 500),
-('Pepsi 330ml', '234567890123', 330),
-('Dasani Water 1L', '345678901234', 1000);
-
--- Insert sample users
-INSERT INTO users (username) VALUES
-('Nick'),
-('Wim'),
-('Alex'),
-('Anne'),
-('Mike');
 
 -- Insert sample employee
 INSERT INTO Employee (first_name, last_name, date_of_birth) VALUES
@@ -120,6 +97,21 @@ INSERT INTO NutritionValues (dish, calories, protein, carbs, fats, salt, water, 
 ('orange juice', 112, 2, 26, 0.5, 0.3, 280, 1),
 ('IV', 0, 0, 0, 0, 0, 1000, 1);
 
+-- Insert sample barcodes
+INSERT INTO Barcodes (nutrition_id, barcode) VALUES
+(1, '123456789012'),
+(2, '123456789013'),
+(3, '123456789014'),
+(5, '123456789015'),
+(7, '123456789016'),
+(9, '123456789017'),
+(10, '123456789018'),
+(13, '123456789019'),
+(14, '123456789020'),
+(16, '123456789021'),
+(17, '123456789022'),
+(19, '123456789023'),
+(20, '123456789024');
 
 -- Insert sample patients
 INSERT INTO Patients (roomnumber, patient_id, first_name, last_name, date_of_birth, max_fluid_intake, state) VALUES
