@@ -257,5 +257,77 @@ module.exports = function (db) {
         });
       });
 
+ // API to update a log
+router.put('/updateLog', (req, res) => {
+    const { log_id, input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount } = req.body;
+
+    if (!log_id || !input_user_id || !patient_id || !time || !date || !nutrition_id || !category || !corrected_amount) {
+        return res.status(400).send({ message: 'All fields are required to update a log' });
+    }
+
+    const sql = 'UPDATE Logs SET input_user_id = ?, patient_id = ?, time = ?, date = ?, nutrition_id = ?, category = ?, corrected_amount = ? WHERE log_id = ?';
+    db.query(sql, [log_id, input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount], (err, result) => {
+        if (err) {
+            console.error('Error updating log:', err);
+            return res.status(500).send({ message: 'Error updating log' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ message: 'Log not found' });
+        }
+
+        res.send({ message: 'Log updated successfully' });
+    });
+});
+
+// API to delete a log
+router.delete('/deleteLog', (req, res) => {
+    const { log_id } = req.body;
+
+    if (!log_id) {
+        return res.status(400).send({ message: 'Log ID is required to delete the log' });
+    }
+
+    const sql = 'DELETE FROM Logs WHERE log_id = ?';
+    db.query(sql, [log_id], (err, result) => {
+        if (err) {
+            console.error('Error deleting log:', err);
+            return res.status(500).send({ message: 'Error deleting log' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ message: 'Log not found' });
+        }
+
+        res.send({ message: 'Log deleted successfully' });
+    });
+});
+
+
+ // API to update a log in LogsOut
+router.put('/updateLogOut', (req, res) => {
+    const { logsOut_id, input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount } = req.body;
+
+    if (!log_out_id || !input_user_id || !patient_id || !time || !date || !nutrition_id || !category || !corrected_amount) {
+        return res.status(400).send({ message: 'All fields are required to update a log in LogsOut' });
+    }
+
+    const sql = 'UPDATE LogsOut SET input_user_id = ?, patient_id = ?, time = ?, date = ?, nutrition_id = ?, category = ?, corrected_amount = ? WHERE log_out_id = ?';
+    db.query(sql, [logsOut_id, input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount], (err, result) => {
+        if (err) {
+            console.error('Error updating log in LogsOut:', err);
+            return res.status(500).send({ message: 'Error updating log in LogsOut' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ message: 'Log in LogsOut not found' });
+        }
+
+        res.send({ message: 'Log in LogsOut updated successfully' });
+    });
+});
+
+ 
+
     return router; // Return the router object with all defined routes
 };
