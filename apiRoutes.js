@@ -275,7 +275,7 @@ router.put('/updateLog', (req, res) => {
         return res.status(400).send({ message: 'All fields are required to update a log' });
     }
 
-    const sql = 'UPDATE Logs SET corrected_amount = ? WHERE log_id = ?';
+    const sql = 'UPDATE Logs SET corrected_amount = ? WHERE id = ?';
     db.query(sql, [log_id, corrected_amount], (err, result) => {
         if (err) {
             console.error('Error updating log:', err);
@@ -298,7 +298,7 @@ router.delete('/deleteLog', (req, res) => {
         return res.status(400).send({ message: 'Log ID is required to delete the log' });
     }
 
-    const sql = 'DELETE FROM Logs WHERE log_id = ?';
+    const sql = 'DELETE FROM Logs WHERE id = ?';
     db.query(sql, [log_id], (err, result) => {
         if (err) {
             console.error('Error deleting log:', err);
@@ -322,7 +322,7 @@ router.put('/updateLogOut', (req, res) => {
         return res.status(400).send({ message: 'All fields are required to update a log in LogsOut' });
     }
 
-    const sql = 'UPDATE LogsOut SET amount = ? WHERE log_out_id = ?';
+    const sql = 'UPDATE LogsOut SET amount = ? WHERE id = ?';
     db.query(sql, [logsOut_id, amount], (err, result) => {
         if (err) {
             console.error('Error updating log in LogsOut:', err);
@@ -345,7 +345,7 @@ router.delete('/deleteLogOut', (req, res) => {
         return res.status(400).send({ message: 'Log ID is required to delete the log' });
     }
 
-    const sql = 'DELETE FROM LogsOut WHERE logsOut_id = ?';
+    const sql = 'DELETE FROM LogsOut WHERE id = ?';
     db.query(sql, [logsOut_id], (err, result) => {
         if (err) {
             console.error('Error deleting log:', err);
