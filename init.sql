@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS Employee (
 
 -- Create the `log` table
 CREATE TABLE IF NOT EXISTS Logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     input_user_id INT NOT NULL,
     patient_id INT NOT NULL,
     time TIME NOT NULL,
@@ -19,6 +20,7 @@ CREATE TABLE IF NOT EXISTS Logs (
 
 -- Create the `log_out` table
 CREATE TABLE IF NOT EXISTS LogsOut (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     input_user_id INT NOT NULL,
     patient_id INT NOT NULL,
     time TIME NOT NULL,
@@ -50,7 +52,7 @@ CREATE TABLE IF NOT EXISTS Barcodes (
 -- Create the `Patients` table
 CREATE TABLE IF NOT EXISTS Patients (
     roomnumber INT NOT NULL,
-    patient_id INT PRIMARY KEY,
+    patient_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     date_of_birth DATE NOT NULL,
