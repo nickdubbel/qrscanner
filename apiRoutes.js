@@ -18,7 +18,7 @@ module.exports = function (db) {
 
             db.query('INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount) VALUES (?, ?, ?, ?, ?, ?, ?)', logData, (err) => {
                 if (err) return res.status(500).send({ message: 'Error logging nutrition values' });
-                res.send({ message: `Successfully logged nutrition values for product ${dish} for user ${userId}` });
+                res.send({ message: `Successfully logged nutrition values for product ${dish} for user ${userId}`, nutrition_name: dish });
             });
         });
     });
