@@ -241,7 +241,7 @@ module.exports = function (db) {
     });
 
     // get the barcodes
-    app.get('/get-products', (req, res) => {
+    router.post('/get-products', (req, res) => {
         const query = `
           SELECT B.barcode, NV.dish AS name, NV.water 
           FROM Barcodes B 
