@@ -125,11 +125,7 @@ module.exports = function (db) {
                 return res.status(500).send({ message: 'Error fetching user data' });
             }
 
-            if (result.length === 0 || result[0].total_ml_water === null) {
-                return res.status(404).send({ message: 'User not found or no water consumption data available' });
-            }
-
-            const totalWater = result[0].total_ml_water;
+            const totalWater = result.length === 0 || result[0].total_ml_water === null ? 0 : result[0].total_ml_water;
             res.send({ total_ml_water: totalWater });
         });
     });
