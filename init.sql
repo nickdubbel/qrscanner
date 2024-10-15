@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS Logs (
     nutrition_id INT NOT NULL,
     category VARCHAR(255) NOT NULL,
     corrected_amount DOUBLE NOT NULL,
-    ADD COLUMN verified BOOLEAN DEFAULT FALSE
+    verified BOOLEAN DEFAULT FALSE
 );
 
 -- Create the `log_out` table
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS LogsOut (
     date DATE NOT NULL,
     category VARCHAR(255) NOT NULL,
     amount DOUBLE NOT NULL,
-    ADD COLUMN verified BOOLEAN DEFAULT FALSE
+    verified BOOLEAN DEFAULT FALSE
 );
 
 -- Create the `NutritionValues` table without barcode column
