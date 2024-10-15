@@ -94,7 +94,7 @@ INSERT INTO NutritionValues (dish, calories, protein, carbs, fats, salt, water, 
 ('pasta', 350, 10, 60, 8, 3, 200, 1),
 ('apple', 95, 0.5, 25, 0.3, 0, 150, 1),
 ('yogurt', 120, 5, 15, 4, 0.8, 180, 1),
-('water', 0, 0, 0, 0, 0, 250, 0),
+('water', 0, 0, 0, 0, 0, 1000, 1),
 ('soda', 150, 0, 40, 0, 0.2, 300, 1),
 ('orange juice', 112, 2, 26, 0.5, 0.3, 280, 1),
 ('IV', 0, 0, 0, 0, 0, 1000, 1);
