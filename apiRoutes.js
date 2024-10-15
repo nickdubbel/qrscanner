@@ -383,26 +383,26 @@ router.delete('/deleteLogOut', (req, res) => {
     });
 });
 
-  // API to update a log in LogsOut
-router.put('/verifyLogOut', (req, res) => {
-    const { logsOut_id } = req.body;
+ // API to update a log
+router.put('/verifyLogsOut', (req, res) => {
+    const { log_id } = req.body;
 
-    if (!logsOut_id) {
-        return res.status(400).send({ message: 'All fields are required to update a log in LogsOut' });
+    if (!log_id) {
+        return res.status(400).send({ message: 'All fields are required to update a log' });
     }
 
     const sql = 'UPDATE LogsOut SET verified = TRUE WHERE id = ?';
-    db.query(sql, [logsOut_id], (err, result) => {
+    db.query(sql, [log_id], (err, result) => {
         if (err) {
-            console.error('Error updating log in LogsOut:', err);
-            return res.status(500).send({ message: 'Error updating log in LogsOut' });
+            console.error('Error updating logOut:', err);
+            return res.status(500).send({ message: 'Error updating logOut' });
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).send({ message: 'Log in LogsOut not found' });
+            return res.status(404).send({ message: 'LogOut not found' });
         }
 
-        res.send({ message: 'Log in LogsOut updated successfully' });
+        res.send({ message: 'LogOut updated successfully' });
     });
 });
 
