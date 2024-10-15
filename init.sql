@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS Logs (
     date DATE NOT NULL,
     nutrition_id INT NOT NULL,
     category VARCHAR(255) NOT NULL,
-    corrected_amount DOUBLE NOT NULL
+    corrected_amount DOUBLE NOT NULL,
+    verified BOOLEAN DEFAULT FALSE
 );
 
 -- Create the `log_out` table
@@ -26,7 +27,8 @@ CREATE TABLE IF NOT EXISTS LogsOut (
     time TIME NOT NULL,
     date DATE NOT NULL,
     category VARCHAR(255) NOT NULL,
-    amount DOUBLE NOT NULL
+    amount DOUBLE NOT NULL,
+    verified BOOLEAN DEFAULT FALSE
 );
 
 -- Create the `NutritionValues` table without barcode column
@@ -62,19 +64,26 @@ CREATE TABLE IF NOT EXISTS Patients (
 
 -- Insert sample employee
 INSERT INTO Employee (first_name, last_name, date_of_birth) VALUES
-('System', 'Admin', '2000-01-01');
+('System', 'Admin', '2000-01-01'),
+('Anne', 'Ruha', '1999-01-01');
 
 -- Insert sample log entries
-INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount) VALUES
-(1, 126942, '09:08:00', '2024-10-07', 13, 'lunch', 1),
-(1, 126942, '09:08:00', '2024-10-07', 17, 'lunch', 1),
-(1, 126942, '18:18:00', '2024-10-07', 14, 'dinner', 1),
-(1, 126942, '18:18:00', '2024-10-07', 9, 'dinner', 1),
-(1, 126942, '16:16:00', '2024-10-07', 15, 'snacks', 1),
-(1, 126942, '16:16:00', '2024-10-07', 16, 'snacks', 1),
-(1, 126942, '10:58:00', '2024-10-07', 19, 'drinks', 1),
-(1, 126942, '13:47:00', '2024-10-07', 18, 'drinks', 1),
-(1, 126944, '13:47:00', '2024-10-07', 18, 'drinks', 1);
+INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount, verified) VALUES
+(1, 126942, '09:08:00', '2024-10-07', 13, 'lunch', 1, TRUE),
+(1, 126942, '09:08:00', '2024-10-07', 17, 'lunch', 1, TRUE),
+(1, 126942, '18:18:00', '2024-10-07', 14, 'dinner', 1, TRUE),
+(1, 126942, '18:18:00', '2024-10-07', 9, 'dinner', 1, TRUE),
+(1, 126942, '16:16:00', '2024-10-07', 15, 'snacks', 1, TRUE),
+(1, 126942, '16:16:00', '2024-10-07', 16, 'snacks', 1, TRUE),
+(1, 126942, '10:58:00', '2024-10-07', 19, 'drinks', 1, TRUE),
+(1, 126942, '13:47:00', '2024-10-07', 18, 'drinks', 1, TRUE),
+(1, 126944, '13:47:00', '2024-10-07', 18, 'drinks', 1, FALSE);
+
+-- Insert sample log entries
+INSERT INTO LogsOut (input_user_id, patient_id, time, date, category, amount, verified) VALUES
+(1, 126942, '09:08:00', '2024-10-07', 'urine', 400, TRUE),
+(1, 126942, '09:08:00', '2024-10-07', 'vomit', 500, FALSE);
+
 
 -- Insert sample nutrition values
 INSERT INTO NutritionValues (dish, calories, protein, carbs, fats, salt, water, protected) VALUES
@@ -94,7 +103,7 @@ INSERT INTO NutritionValues (dish, calories, protein, carbs, fats, salt, water, 
 ('pasta', 350, 10, 60, 8, 3, 200, 1),
 ('apple', 95, 0.5, 25, 0.3, 0, 150, 1),
 ('yogurt', 120, 5, 15, 4, 0.8, 180, 1),
-('water', 0, 0, 0, 0, 0, 1000, 1),
+('water', 0, 0, 0, 0, 0, 250, 0),
 ('soda', 150, 0, 40, 0, 0.2, 300, 1),
 ('orange juice', 112, 2, 26, 0.5, 0.3, 280, 1),
 ('IV', 0, 0, 0, 0, 0, 1000, 1);
