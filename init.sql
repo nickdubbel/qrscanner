@@ -101,19 +101,16 @@ INSERT INTO NutritionValues (dish, calories, protein, carbs, fats, salt, water, 
 
 -- Insert sample barcodes
 INSERT INTO Barcodes (nutrition_id, barcode) VALUES
-(1, '123456789012'),
-(2, '123456789013'),
-(3, '123456789014'),
-(5, '123456789015'),
-(7, '123456789016'),
-(9, '123456789017'),
-(10, '123456789018'),
-(13, '123456789019'),
-(14, '123456789020'),
-(16, '123456789021'),
-(17, '123456789022'),
-(19, '123456789023'),
-(20, '123456789024');
+(1, '1234567890906'),
+(2, '1234567891002'),
+(3, '1234567890104'),
+(7, '1234567890203'),
+(9, '1234567890302'),
+(14, '1234567890401'),
+(16, '1234567890500'),
+(17, '1234567890609'),
+(19, '1234567890708'),
+(20, '1234567890807');
 
 -- Insert sample patients
 INSERT INTO Patients (roomnumber, patient_id, first_name, last_name, date_of_birth, max_fluid_intake, state) VALUES
