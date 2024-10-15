@@ -179,6 +179,7 @@ module.exports = function (db) {
                 console.error('Error fetching nutrition:', err);
                 return res.status(500).send({ message: 'Error fetching nutrition' });
             }
+            console.log(result);
             res.send(result);
         });
 
