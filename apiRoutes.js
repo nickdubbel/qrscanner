@@ -314,6 +314,28 @@ router.delete('/deleteLog', (req, res) => {
     });
 });
 
+ // API to update a log
+router.put('/verifyLog', (req, res) => {
+    const { log_id } = req.body;
+
+    if (!log_id) {
+        return res.status(400).send({ message: 'All fields are required to update a log' });
+    }
+
+    const sql = 'UPDATE Logs SET verified = TRUE WHERE id = ?';
+    db.query(sql, [log_id], (err, result) => {
+        if (err) {
+            console.error('Error updating log:', err);
+            return res.status(500).send({ message: 'Error updating log' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ message: 'Log not found' });
+        }
+
+        res.send({ message: 'Log updated successfully' });
+    });
+});
 
  // API to update a log in LogsOut
 router.put('/updateLogOut', (req, res) => {
@@ -360,6 +382,30 @@ router.delete('/deleteLogOut', (req, res) => {
         res.send({ message: 'Log deleted successfully' });
     });
 });
+
+  // API to update a log in LogsOut
+router.put('/verifyLogOut', (req, res) => {
+    const { logsOut_id } = req.body;
+
+    if (!logsOut_id) {
+        return res.status(400).send({ message: 'All fields are required to update a log in LogsOut' });
+    }
+
+    const sql = 'UPDATE LogsOut SET verified = TRUE WHERE id = ?';
+    db.query(sql, [logsOut_id], (err, result) => {
+        if (err) {
+            console.error('Error updating log in LogsOut:', err);
+            return res.status(500).send({ message: 'Error updating log in LogsOut' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ message: 'Log in LogsOut not found' });
+        }
+
+        res.send({ message: 'Log in LogsOut updated successfully' });
+    });
+});
+
  
  
 
