@@ -106,14 +106,18 @@ module.exports = function (db) {
 
         // Updated SQL to fetch total water consumption using the new database structure
         const sql = `
-            SELECT SUM(water_sum) AS total_ml_water
-            FROM (
-                SELECT NV.id, L.patient_id, NV.dish, SUM(NV.water * L.corrected_amount) AS water_sum
-                FROM Logs L
-                INNER JOIN NutritionValues NV ON L.nutrition_id = NV.id
-                WHERE L.patient_id = ?
-                GROUP BY NV.id, L.patient_id, NV.dish
-            ) AS patient_water`;
+            SELECT (
+                SELECT SUM(water_sum) AS total_ml_water
+                FROM (
+                    SELECT NV.id, L.patient_id, NV.dish, SUM(NV.water * L.corrected_amount) AS water_sum
+                    FROM Logs L
+                    INNER JOIN NutritionValues NV ON L.nutrition_id = NV.id
+                    WHERE L.patient_id = ? AND L.date = CURDATE()
+                    GROUP BY NV.id, L.patient_id, NV.dish
+                ) AS patient_water
+            ) - (
+                SELECT IFNULL(SUM(amount), 0) FROM LogsOut WHERE patient_id = ? AND date = CURDATE()
+            ) AS total_ml_water`;
 
         db.query(sql, [userId], (err, result) => {
             if (err) {
