@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS Patients (
 
 -- Insert sample employee
 INSERT INTO Employee (first_name, last_name, date_of_birth) VALUES
-('System', 'Admin', '2000-01-01');
+('System', 'Admin', '2000-01-01'),
 ('Anne', 'Ruha', '1999-01-01');
 
 -- Insert sample log entries
