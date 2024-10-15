@@ -49,7 +49,7 @@ module.exports = function (db) {
                 if (productResult.length === 0) return res.status(404).send({ message: 'Product not found' });
 
                 const nutritionId = productResult[0].id;
-                waterL = waterMl / 1000;
+                let waterL = waterMl / 1000;
                 const logData = [inputUserId, userId, time, date, nutritionId, 'qr-scan', waterL];
 
                 db.query('INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount) VALUES (?, ?, ?, ?, ?, ?, ?)', logData, (err) => {
