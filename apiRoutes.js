@@ -119,7 +119,7 @@ module.exports = function (db) {
                 SELECT IFNULL(SUM(amount), 0) FROM LogsOut WHERE patient_id = ? AND date = CURDATE()
             ) AS total_ml_water`;
 
-        db.query(sql, [userId], (err, result) => {
+        db.query(sql, [userId, userId], (err, result) => {
             if (err) {
                 console.error('Error fetching user data:', err);
                 return res.status(500).send({ message: 'Error fetching user data' });
