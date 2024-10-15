@@ -222,13 +222,13 @@ module.exports = function (db) {
 
     // API to add to log
     router.post('/add-log', (req, res) => {
-        const { input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount } = req.body;
-        if (!input_user_id || !patient_id || !time || !date || !nutrition_id || !category || !corrected_amount) {
+        const { input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount, verified } = req.body;
+        if (!input_user_id || !patient_id || !time || !date || !nutrition_id || !category || !corrected_amount || !verified) {
             return res.status(400).send({ message: 'Not all fields were added correctly' });
         }
 
-        const sql = 'INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        db.query(sql, [input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount], (err, result) => {
+        const sql = 'INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount, verified) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+        db.query(sql, [input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount, verified], (err, result) => {
             if (err) {
                 console.error('Error adding log:', err);
                 return res.status(500).send({ message: 'Error adding log' });
@@ -240,13 +240,13 @@ module.exports = function (db) {
 
     // API to add to log
     router.post('/add-logOut', (req, res) => {
-        const { input_user_id, patient_id, time, date, category, amount } = req.body;
-        if (!input_user_id || !patient_id || !time || !date|| !category || !amount) {
+        const { input_user_id, patient_id, time, date, category, amount, verified } = req.body;
+        if (!input_user_id || !patient_id || !time || !date|| !category || !amount || !verified) {
             return res.status(400).send({ message: 'Not all fields were added correctly' });
         }
 
-        const sql = 'INSERT INTO LogsOut (input_user_id, patient_id, time, date, category, amount) VALUES (?, ?, ?, ?, ?, ?)';
-        db.query(sql, [input_user_id, patient_id, time, date, category, amount], (err, result) => {
+        const sql = 'INSERT INTO LogsOut (input_user_id, patient_id, time, date, category, amount, verified) VALUES (?, ?, ?, ?, ?, ?)';
+        db.query(sql, [input_user_id, patient_id, time, date, category, amount, verified], (err, result) => {
             if (err) {
                 console.error('Error adding logOut:', err);
                 return res.status(500).send({ message: 'Error adding logOut' });
