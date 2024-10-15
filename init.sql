@@ -82,7 +82,7 @@ INSERT INTO Logs (input_user_id, patient_id, time, date, nutrition_id, category,
 -- Insert sample log entries
 INSERT INTO LogsOut (input_user_id, patient_id, time, date, category, amount, verified) VALUES
 (1, 126942, '09:08:00', '2024-10-07', 'urine', 400, TRUE),
-(1, 126942, '09:08:00', '2024-10-07', 'vomit', 500, FALSE),
+(1, 126942, '09:08:00', '2024-10-07', 'vomit', 500, FALSE);
 
 
 -- Insert sample nutrition values
