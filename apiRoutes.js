@@ -339,18 +339,14 @@ router.put('/verifyLog', (req, res) => {
 
  // API to update a log in LogsOut
 router.put('/updateLogOut', (req, res) => {
-    const { log_id, amount } = req.body;
-
-   console.log(req.body);
- console.log(log_id);
-   console.log(amount);
+    const { logsOut_id, corrected_amount } = req.body;
  
-    if (!log_id || !amount) {
+    if (!logsOut_id || !corrected_amount) {
         return res.status(400).send({ message: 'All fields are required to update a log in LogsOut' });
     }
 
     const sql = 'UPDATE LogsOut SET amount = ? WHERE id = ?';
-    db.query(sql, [amount, log_id], (err, result) => {
+    db.query(sql, [corrected_amount, logsOut_id], (err, result) => {
         if (err) {
             console.error('Error updating log in LogsOut:', err);
             return res.status(500).send({ message: 'Error updating log in LogsOut' });
