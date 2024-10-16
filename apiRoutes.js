@@ -237,6 +237,14 @@ module.exports = function (db) {
     // API to add to log
     router.post('/add-logOut', (req, res) => {
         const { input_user_id, patient_id, time, date, category, amount, verified } = req.body;
+ console.log(req.body);
+     console.log(input_user_id);
+    console.log(patient_id);
+    console.log(currentTime);
+    console.log(currentDate);
+    console.log(category);
+    console.log(amount);
+    console.log(isNurse);
         if (!input_user_id || !patient_id || !time || !date|| !category || !amount || !verified) {
             return res.status(400).send({ message: 'Not all fields were added correctly' });
         }
