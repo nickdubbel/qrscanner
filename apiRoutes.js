@@ -277,7 +277,7 @@ router.put('/updateLog', (req, res) => {
     }
 
     const sql = 'UPDATE Logs SET corrected_amount = ? WHERE id = ?';
-    db.query(sql, [log_id, corrected_amount], (err, result) => {
+    db.query(sql, [corrected_amount, log_id], (err, result) => {
         if (err) {
             console.error('Error updating log:', err);
             return res.status(500).send({ message: 'Error updating log' });
@@ -348,7 +348,7 @@ router.put('/updateLogOut', (req, res) => {
     }
 
     const sql = 'UPDATE LogsOut SET amount = ? WHERE id = ?';
-    db.query(sql, [logsOut_id, amount], (err, result) => {
+    db.query(sql, [amount, logsOut_id], (err, result) => {
         if (err) {
             console.error('Error updating log in LogsOut:', err);
             return res.status(500).send({ message: 'Error updating log in LogsOut' });
