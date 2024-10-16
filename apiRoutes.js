@@ -339,14 +339,18 @@ router.put('/verifyLog', (req, res) => {
 
  // API to update a log in LogsOut
 router.put('/updateLogOut', (req, res) => {
-    const { logsOut_id, amount } = req.body;
+    const { log_id, amount } = req.body;
 
-    if (!logsOut_id || !amount) {
+   console.log(req.body);
+ console.log(log_id);
+   console.log(amount);
+ 
+    if (!log_id || !amount) {
         return res.status(400).send({ message: 'All fields are required to update a log in LogsOut' });
     }
 
     const sql = 'UPDATE LogsOut SET amount = ? WHERE id = ?';
-    db.query(sql, [amount, logsOut_id], (err, result) => {
+    db.query(sql, [amount, log_id], (err, result) => {
         if (err) {
             console.error('Error updating log in LogsOut:', err);
             return res.status(500).send({ message: 'Error updating log in LogsOut' });
@@ -385,17 +389,14 @@ router.delete('/deleteLogOut', (req, res) => {
 
  // API to update a log
 router.put('/verifyLogsOut', (req, res) => {
-    const { logsOut_id } = req.body;
-
-    console.log(req.body);
-    console.log(logsOut_id);
+    const { log_id } = req.body;
  
-    if (!logsOut_id) {
+    if (!log_id ) {
         return res.status(400).send({ message: 'All fields are required to update a log' });
     }
 
     const sql = 'UPDATE LogsOut SET verified = TRUE WHERE id = ?';
-    db.query(sql, [logsOut_id], (err, result) => {
+    db.query(sql, [log_id], (err, result) => {
         if (err) {
             console.error('Error updating logOut:', err);
             return res.status(500).send({ message: 'Error updating logOut' });
