@@ -385,14 +385,17 @@ router.delete('/deleteLogOut', (req, res) => {
 
  // API to update a log
 router.put('/verifyLogsOut', (req, res) => {
-    const { log_id } = req.body;
+    const { logsOut_id } = req.body;
 
-    if (!log_id) {
+    console.log(req.body);
+    console.log(logsOut_id);
+ 
+    if (!logsOut_id) {
         return res.status(400).send({ message: 'All fields are required to update a log' });
     }
 
     const sql = 'UPDATE LogsOut SET verified = TRUE WHERE id = ?';
-    db.query(sql, [log_id], (err, result) => {
+    db.query(sql, [logsOut_id], (err, result) => {
         if (err) {
             console.error('Error updating logOut:', err);
             return res.status(500).send({ message: 'Error updating logOut' });
