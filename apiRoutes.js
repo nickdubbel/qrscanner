@@ -240,11 +240,11 @@ module.exports = function (db) {
  console.log(req.body);
      console.log(input_user_id);
     console.log(patient_id);
-    console.log(currentTime);
-    console.log(currentDate);
+    console.log(time);
+    console.log(date);
     console.log(category);
     console.log(amount);
-    console.log(isNurse);
+    console.log(verified);
         if (!input_user_id || !patient_id || !time || !date|| !category || !amount || !verified) {
             return res.status(400).send({ message: 'Not all fields were added correctly' });
         }
