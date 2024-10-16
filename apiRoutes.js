@@ -287,8 +287,6 @@ router.put('/updateLog', (req, res) => {
             return res.status(404).send({ message: 'Log not found' });
         }
 
-       console.log(result);
-
         res.send({ message: 'Log updated successfully' });
     });
 });
