@@ -271,24 +271,26 @@ module.exports = function (db) {
  // API to update a log
 router.put('/updateLog', (req, res) => {
     const { log_id, corrected_amount } = req.body;
-
-    console.log(req);
-    console.log(req.body);
+ 
     console.log(log_id);
     console.log(corrected_amount);
 
     if (!log_id || !corrected_amount) {
+        console.log('In the if');
         return res.status(400).send({ message: 'All fields are required to update a log' });
     }
 
     const sql = 'UPDATE Logs SET corrected_amount = ? WHERE id = ?';
+    console.log('Maybe wrong SQL?');
     db.query(sql, [log_id, corrected_amount], (err, result) => {
         if (err) {
+            console.log('Error');
             console.error('Error updating log:', err);
             return res.status(500).send({ message: 'Error updating log' });
         }
 
         if (result.affectedRows === 0) {
+            console.log('Nothing affected');
             return res.status(404).send({ message: 'Log not found' });
         }
 
