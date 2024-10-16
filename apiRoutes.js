@@ -272,6 +272,11 @@ module.exports = function (db) {
 router.put('/updateLog', (req, res) => {
     const { log_id, corrected_amount } = req.body;
 
+    console.log(req);
+    console.log(req.body);
+    console.log(log_id);
+    console.log(corrected_amount);
+
     if (!log_id || !corrected_amount) {
         return res.status(400).send({ message: 'All fields are required to update a log' });
     }
