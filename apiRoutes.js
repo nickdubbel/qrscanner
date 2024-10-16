@@ -219,7 +219,7 @@ module.exports = function (db) {
     // API to add to log
     router.post('/add-log', (req, res) => {
         const { input_user_id, patient_id, time, date, nutrition_id, category, corrected_amount, verified } = req.body;
-        if (!input_user_id || !patient_id || !time || !date || !nutrition_id || !category || !corrected_amount || !verified) {
+        if (!input_user_id || !patient_id || !time || !date || !nutrition_id || !category || !corrected_amount) {
             return res.status(400).send({ message: 'Not all fields were added correctly' });
         }
 
@@ -237,19 +237,12 @@ module.exports = function (db) {
     // API to add to log
     router.post('/add-logOut', (req, res) => {
         const { input_user_id, patient_id, time, date, category, amount, verified } = req.body;
- console.log(req.body);
-     console.log(input_user_id);
-    console.log(patient_id);
-    console.log(time);
-    console.log(date);
-    console.log(category);
-    console.log(amount);
-    console.log(verified);
-        if (!input_user_id || !patient_id || !time || !date|| !category || !amount || !verified) {
+     
+        if (!input_user_id || !patient_id || !time || !date|| !category || !amount) {
             return res.status(400).send({ message: 'Not all fields were added correctly' });
         }
 
-        const sql = 'INSERT INTO LogsOut (input_user_id, patient_id, time, date, category, amount, verified) VALUES (?, ?, ?, ?, ?, ?)';
+        const sql = 'INSERT INTO LogsOut (input_user_id, patient_id, time, date, category, amount, verified) VALUES (?, ?, ?, ?, ?, ?, ?)';
         db.query(sql, [input_user_id, patient_id, time, date, category, amount, verified], (err, result) => {
             if (err) {
                 console.error('Error adding logOut:', err);
