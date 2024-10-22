@@ -198,6 +198,18 @@ module.exports = function (db) {
         });
     });
 
+    // Fetch a all patient's
+    router.get('/patients', async (req, res) => {
+        const sql = 'SELECT * FROM Patients;
+        db.query(sql, [], (err, result) => {
+            if (err) {
+                console.error('Error fetching patient data:', err);
+                return res.status(500).send({ message: 'Error fetching patient data' });
+            }
+            res.send(result);
+        });
+    });
+
     // Fetch patients by room number and state (e.g., active)
     router.get('/roomnumber', async (req, res) => {
         const { roomnumber, state } = req.query;
