@@ -199,7 +199,7 @@ module.exports = function (db) {
     });
 
     // Fetch a all patient's
-    router.get('/patients', async (req, res) => {
+    router.get('/allPatients', async (req, res) => {
         const sql = 'SELECT * FROM Patients;
         db.query(sql, [], (err, result) => {
             if (err) {
