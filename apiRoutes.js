@@ -200,7 +200,7 @@ module.exports = function (db) {
 
     // Fetch a all patient's
     router.get('/allPatients', async (req, res) => {
-        const sql = 'SELECT * FROM Patients;
+        const sql = 'SELECT * FROM Patients';
         db.query(sql, [], (err, result) => {
             if (err) {
                 console.error('Error fetching patient data:', err);
